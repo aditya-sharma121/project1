@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # VeritasDoc: Explainable AI Content Detector for Document Submissions
 
 > **WUElev8 Innovation Services — Hackathon Problem Statement A1**  
@@ -111,3 +112,6 @@ python main.py
 
 4. **Step 4: Export Official Tamper-Evident PDF Certificate**
    - Click **"Export PDF Certificate"** to download the institutional audit certificate containing the cryptographic **SHA-256 checksum**, **3-Zone Academic Verdict**, **Neural Consensus Matrix**, and **Evaluator Disclaimers**.
+=======
+# project1
+>>>>>>> 0941ba6de9269c4f8a0ce6ca564bdf64596fb19d
