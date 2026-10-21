@@ -7,6 +7,7 @@ tamper-evident PDF reports, LMS webhooks, and static frontend assets.
 import datetime
 import logging
 import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import shutil
 import sqlite3
 import threading
@@ -109,7 +110,7 @@ class LMSWebhookRequest(BaseModel):
     esl_safeguard: bool = True
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health_check():
     """Health check endpoint reporting server and model status."""
     status_info = get_model_status()
@@ -118,9 +119,13 @@ async def health_check():
         "status": "ok" if loaded else "degraded",
         "model": status_info["model_name"] if loaded else "none",
         "model_loaded": loaded,
+        "active_models_count": status_info.get("active_models_count", 0),
+        "total_models_count": status_info.get("total_models_count", 0),
+        "active_models": status_info.get("active_models", []),
         "device": status_info["device"],
         "model_type": status_info["model_type"],
     }
+
 
 
 @app.post("/analyze")

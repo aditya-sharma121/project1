@@ -199,7 +199,19 @@ def _load_single_model(key: str, cfg: dict) -> bool:
 
     try:
         logger.info("Initializing neural subsystem [%s]...", key)
-        tokenizer = AutoTokenizer.from_pretrained(repo_id, token=hf_token)
+        tokenizer = None
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(repo_id, token=hf_token)
+        except Exception as e_tok:
+            logger.warning("Primary tokenizer load failed for [%s]: %s. Trying fallback...", key, e_tok)
+            try:
+                tokenizer = AutoTokenizer.from_pretrained(repo_id, token=hf_token, use_fast=False)
+            except Exception:
+                if "roberta" in repo_id.lower():
+                    logger.info("Falling back to standard roberta-base tokenizer for [%s]...", key)
+                    tokenizer = AutoTokenizer.from_pretrained("roberta-base", token=hf_token)
+                else:
+                    raise e_tok
 
         if cfg["type"] == "sequence_classification":
             model = AutoModelForSequenceClassification.from_pretrained(repo_id, token=hf_token)
@@ -256,8 +268,11 @@ def load_detection_model() -> bool:
     def _bg_load_gamma():
         try:
             logger.info("Initializing background neural subsystem [core_gamma]...")
-            _load_single_model("core_gamma", ENSEMBLE_CONFIG["core_gamma"])
-            logger.info("Subsystem [core_gamma] successfully joined active neural consensus!")
+            success = _load_single_model("core_gamma", ENSEMBLE_CONFIG["core_gamma"])
+            if success:
+                logger.info("Subsystem [core_gamma] successfully joined active neural consensus!")
+            else:
+                logger.warning("Subsystem [core_gamma] initialization deferred.")
         except Exception as e:
             logger.warning("Subsystem [core_gamma] load deferred: %s", e)
         finally:

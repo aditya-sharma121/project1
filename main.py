@@ -7,6 +7,9 @@ Run via:
 or double-click:
     run.bat
 """
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 import socket
 import sys
 import time
